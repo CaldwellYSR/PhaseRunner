@@ -8,7 +8,7 @@ public class CollectSpeedForce : MonoBehaviour {
     {
         if (other.transform.parent.tag == Tag)
         {
-            Score(other.transform.parent.gameObject);
+            Score(other.gameObject);
         }
     }
 
