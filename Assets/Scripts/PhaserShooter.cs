@@ -13,18 +13,22 @@ public class PhaserShooter : MonoBehaviour
 	void Update ()
     {
 
-        if (Input.GetButtonDown("Fire") && hasPhaser)
+        if (Input.GetButtonDown("Fire"))
         {
-            Fire();
+            if (hasPhaser)
+            {
+                Fire();
+            }
+            else
+            {
+                ResetPhaser();
+                Fire();
+            }
         }
 
         if (Input.GetButtonDown("Teleport") && !hasPhaser)
         {
             Teleport();
-        }
-        else if (Input.GetButtonDown("Cancel") && !hasPhaser)
-        {
-            ResetPhaser();
         }
 		
 	}
