@@ -10,6 +10,8 @@ public class PlayerMovement : MonoBehaviour
     private float HorizontalMovement, VerticalMovement;
     private CharacterController controller;
     private Vector3 moveDirection = Vector3.zero;
+    private bool canDoubleJump = false;
+    private Vector3 wallCollisionPoint;
 
     void Start ()
     {
@@ -25,9 +27,27 @@ public class PlayerMovement : MonoBehaviour
             moveDirection = new Vector3(HorizontalMovement, 0, VerticalMovement);
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= Speed;
-            if (Input.GetButton("Jump"))
+            if (Input.GetButtonDown("Jump"))
             {
-                moveDirection.y = jumpSpeed;
+                canDoubleJump = true;
+                Jump();
+            }
+        }
+        else
+        {
+            if (controller.collisionFlags == CollisionFlags.Sides)
+            {
+                canDoubleJump = false;
+                if (Input.GetButtonDown("Jump"))
+                {
+                    canDoubleJump = true;
+                    WallJump();
+                }
+            }
+            else if (Input.GetButtonDown("Jump") && canDoubleJump)
+            {
+                canDoubleJump = false;
+                Jump();
             }
         }
         moveDirection.y -= gravity * Time.deltaTime;
@@ -36,5 +56,24 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         controller.Move(moveDirection * Time.deltaTime);
+    }
+
+    private void Jump()
+    {
+        moveDirection.y = jumpSpeed;
+    }
+
+    private void WallJump()
+    {
+        moveDirection += wallCollisionPoint * 2;
+        Jump();
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (controller.collisionFlags == CollisionFlags.Sides)
+        {
+            wallCollisionPoint = hit.collider.ClosestPointOnBounds(transform.position) - transform.position;
+        }
     }
 }
